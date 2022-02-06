@@ -43,11 +43,6 @@ const LoginForm: FunctionComponent<ILoginFormProps> = ({ onLoginSuccess }) => {
 
     if (!validate()) return;
 
-    // const loginCredentials = {
-    //   email,
-    //   password
-    // };
-
     onLoginSuccess(email);
     navigate('/comments');
     console.log('navigated');

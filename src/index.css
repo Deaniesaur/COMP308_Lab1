@@ -59,7 +59,14 @@ code {
 
 .appreciationText {
   display: block;
-  margin: 20px auto;
+  font-size: 1.5em;
+  margin: 25px;
+}
+
+.detailsText {
+  display: inline-block;
+  font-size: 1.2em;
+  text-align: start;
 }
 
 .restrictedText {

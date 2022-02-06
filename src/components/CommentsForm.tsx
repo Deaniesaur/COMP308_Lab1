@@ -1,57 +1,45 @@
 import { FormEvent, FunctionComponent, useState } from 'react';
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Evaluation from '../shared/Evaluation';
 
 interface IAppProps {
-  studentEmail: string
+  studentEmail: string,
+  submitEval: (evaluation: Evaluation) => void
 }
 
-const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
+const App: FunctionComponent<IAppProps> = ({ studentEmail, submitEval }) => {
   const [courseCode, setCourseCode] = useState('');
   const [courseName, setCourseName] = useState('');
   const [topic, setTopic] = useState('');
   const [rating, setRating] = useState('');
   const [comment, setComment] = useState('');
 
-  const [codeError, setCodeError] = useState(false);
-  const [nameError, setNameError] = useState(false);
-  const [ratingError, setRatingError] = useState(false);
-
+  const [codeError, setCodeError] = useState(true);
+  const [nameError, setNameError] = useState(true);
+  const [ratingError, setRatingError] = useState(true);
+  const [commentsError, setCommentsError] = useState(true);
+  const [valid, setValid] = useState(false);
   const navigate = useNavigate();
 
-  const validate = () => {
-    let valid = true;
+  const validate = (newValue: any, valueSetter: Function, errorSetter: Function) => {
+    valueSetter(newValue);
 
-    if (courseCode === '') {
-      setCodeError(true);
-      valid = false;
+    if (newValue === '') {
+      setValid(false);
+      errorSetter(true);
     } else {
-      setCodeError(false);
-    };
-
-    if (courseName === '') {
-      setNameError(true);
-      valid = false;
-    } else {
-      setNameError(false);
-    };
-
-    if (rating === '') {
-      setRatingError(true);
-      valid = false;
-    } else {
-      setRatingError(false);
-    };
-
-    return valid;
+      errorSetter(false);
+      setValid(!codeError && !nameError && !ratingError && !commentsError);
+    }
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    if (!validate()) return;
+    if (!valid) return;
 
-    const studentResponse = {
+    const evaluation: Evaluation = {
       courseCode,
       courseName,
       studentEmail,
@@ -60,7 +48,9 @@ const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
       comment
     };
 
-    navigate('/thankyou', { state: studentResponse });
+    submitEval(evaluation);
+
+    navigate('/thankyou');
   };
 
   return (
@@ -68,8 +58,7 @@ const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
         <div className='formControl'>
           <TextField
             onChange={e => {
-              setCourseCode(e.target.value);
-              validate();
+              validate(e.target.value, setCourseCode, setCodeError);
             }}
             error={codeError}
             className='textControl'
@@ -79,8 +68,7 @@ const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
         <div className="formControl">
           <TextField
             onChange={e => {
-              setCourseName(e.target.value);
-              validate();
+              validate(e.target.value, setCourseName, setNameError);
             }}
             error={nameError}
             className='textControl'
@@ -106,8 +94,7 @@ const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
             <Select
               value={rating}
               onChange={e => {
-                setRating(e.target.value);
-                validate();
+                validate(e.target.value, setRating, setRatingError);
               }}
               error={ratingError}
               label="Rating"
@@ -120,13 +107,24 @@ const App: FunctionComponent<IAppProps> = ({ studentEmail }) => {
         </div>
         <div className="formControl">
           <TextField
-            onChange={e => setComment(e.target.value)}
+            onChange={e => {
+              validate(e.target.value, setComment, setCommentsError);
+            }}
+            error={commentsError}
             className='textControl'
             label='Comments'
             multiline
-            rows={4} />
+            rows={4}
+            required />
         </div>
-        <Button type='submit'>Submit</Button>
+        <div className='formControl'>
+          <Button
+            disabled={!valid}
+            type='submit'
+            variant='contained'
+            >Submit
+          </Button>
+        </div>
       </form>
   );
 };

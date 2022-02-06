@@ -8,10 +8,17 @@ import ThankYouForm from './components/ThankYouForm';
 import Restricted from './components/Restricted';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Evaluation from './shared/Evaluation';
 
 function App () {
   const [studentEmail, setStudentEmail] = useState('');
+  const [evaluation, setEvaluation] = useState<Evaluation>({} as Evaluation);
   const handleLoginSuccess = (email: string) => setStudentEmail(email);
+  const handleSubmitEval = (evaluation: Evaluation) => setEvaluation(evaluation);
+
+  const commentsPage = <CommentsForm studentEmail={studentEmail} submitEval={handleSubmitEval}/>;
+  const thankYouPage = <ThankYouForm evaluation={evaluation}/>;
+  const restrictedPage = <Navigate to='/restricted' />;
 
   return (
     <div>
@@ -23,16 +30,22 @@ function App () {
             <Route
               path='/comments'
               element={
-                studentEmail ? <CommentsForm studentEmail={studentEmail}/> : <Navigate to='/restricted' />
-              } />
+                studentEmail ? commentsPage : restrictedPage
+              }
+            />
             <Route
               path='/thankyou'
               element={
-                studentEmail ? <ThankYouForm studentEmail={studentEmail}/> : <Navigate to='/restricted' />
+                evaluation.rating && evaluation.comment ? thankYouPage : restrictedPage
               } />
             <Route
               path='/restricted'
-              element={ <Restricted></Restricted> } />
+              element={ <Restricted></Restricted> }
+            />
+            <Route
+              path='*'
+              element={<Navigate to='/restricted' />}
+            />
           </Routes>
         </div>
         <Footer />

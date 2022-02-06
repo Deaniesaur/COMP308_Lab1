@@ -10,7 +10,7 @@ const Restricted: FunctionComponent<IResctrictedProps> = (props) => {
 
   return (
     <div className="restricted">
-      <span className='restrictedText'>You need to be logged in to access this page.</span>
+      <span className='restrictedText'>Page NOT Found or Restricted.</span>
       <div className="formControl">
         <Button
           onClick={ () => navigate('/') }
